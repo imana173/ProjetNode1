@@ -120,20 +120,24 @@ const updateVisibility = async (req, res) => {
   // Fonction pour récupérer les détails d'un CV visible
   const getCVDetails = async (req, res) => {
     try {
-      const cvId = req.params.id; // Récupérer l'ID du CV
-      console.log("ID du CV reçu :", cvId);
+      const userId = req.user.id; // ID de l'utilisateur authentifié
+      const cvId = req.params.id; // ID du CV à récupérer
   
-      // Vérifier si l'ID est valide
+      // Vérifier si l'ID du CV est valide
       if (!mongoose.Types.ObjectId.isValid(cvId)) {
-        console.log("ID invalide :", cvId);
         return res.status(400).json({ message: 'ID invalide.' });
       }
   
-      // Trouver le CV visible par son ID
-      const cv = await CV.findOne({ _id: cvId, visibilite: true });
-      console.log("CV trouvé :", cv);
+      // Chercher le CV
+      const cv = await CV.findOne({ _id: cvId });
   
+      // Si le CV n'existe pas
       if (!cv) {
+        return res.status(404).json({ message: 'CV introuvable.' });
+      }
+  
+      // Vérifier la visibilité
+      if (!cv.visibilite && cv.user.toString() !== userId) {
         return res.status(404).json({ message: 'CV introuvable ou non visible.' });
       }
   
@@ -143,14 +147,14 @@ const updateVisibility = async (req, res) => {
         prenom: cv.informationsPersonnelles.prenom,
         nom: cv.informationsPersonnelles.nom,
         description: cv.informationsPersonnelles.description,
-        education: cv.education, // Les sous-documents ne contiennent plus d'_id
-        experience: cv.experience, // Les sous-documents ne contiennent plus d'_id
+        education: cv.education,
+        experience: cv.experience,
       });
     } catch (error) {
-      console.error("Erreur serveur :", error.message);
       res.status(500).json({ message: 'Erreur serveur.', error: error.message });
     }
   };
+  
   
   
   
