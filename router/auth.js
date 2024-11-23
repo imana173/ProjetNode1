@@ -8,5 +8,7 @@ router.post('/register', register);
 // Route POST /auth/login - Connexion
 router.post('/login', login);
 
+
+
 module.exports = router; // Exporter correctement le routeur
 

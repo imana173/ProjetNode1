@@ -154,11 +154,40 @@ const updateVisibility = async (req, res) => {
       res.status(500).json({ message: 'Erreur serveur.', error: error.message });
     }
   };
+
+
+  const getMyCVs = async (req, res) => {
+    try {
+      // Obtenir l'ID utilisateur depuis le token JWT
+      const userId = req.user.id;
+  
+      // Vérifier si l'utilisateur est authentifié
+      if (!userId) {
+        return res.status(401).json({ message: "Utilisateur non authentifié." });
+      }
+  
+      console.log("Utilisateur connecté, ID :", userId); // Debugging log
+  
+      // Rechercher les CV de l'utilisateur connecté
+      const cvs = await CV.find({ user: userId });
+  
+      // Si aucun CV trouvé, retourner une réponse appropriée
+      if (!cvs || cvs.length === 0) {
+        return res.status(404).json({ message: "Aucun CV trouvé pour cet utilisateur." });
+      }
+  
+      // Retourner la liste des CV
+      res.status(200).json(cvs);
+    } catch (error) {
+      console.error("Erreur serveur :", error.message); // Debugging log
+      res.status(500).json({ message: "Erreur serveur.", error: error.message });
+    }
+  };
   
   
   
   
-  module.exports = { createCV, getAllVisibleCVs, deleteCV, updateVisibility, getCVDetails };
+  module.exports = { createCV, getAllVisibleCVs, deleteCV, updateVisibility, getCVDetails, getMyCVs };
   
   
 

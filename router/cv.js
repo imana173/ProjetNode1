@@ -1,5 +1,5 @@
 const express = require('express');
-const { createCV, getAllVisibleCVs, deleteCV, updateVisibility, getCVDetails } = require('../controller/cv');
+const { createCV, getAllVisibleCVs, deleteCV, updateVisibility, getCVDetails, getMyCVs } = require('../controller/cv');
 const authMiddleware = require('../midlleware/jws'); // Middleware pour protéger certaines routes
 
 const router = express.Router();
@@ -18,6 +18,7 @@ router.delete('/:id', authMiddleware, deleteCV);
 
 
 router.get('/:id',authMiddleware, getCVDetails);
+router.get('/user/mine', authMiddleware, getMyCVs);
 
 module.exports = router;
 
