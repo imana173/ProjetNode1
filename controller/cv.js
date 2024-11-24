@@ -187,8 +187,47 @@ const updateVisibility = async (req, res) => {
   
   
   
-  module.exports = { createCV, getAllVisibleCVs, deleteCV, updateVisibility, getCVDetails, getMyCVs };
   
+  
+  const updateCV = async (req, res) => {
+    try {
+        const userId = req.user.id; // ID de l'utilisateur authentifié
+        const cvId = req.params.id; // ID du CV à modifier
+        const { informationsPersonnelles, education, experience, visibilite } = req.body;
+
+        // Vérifier si l'ID est valide
+        if (!mongoose.Types.ObjectId.isValid(cvId)) {
+            return res.status(400).json({ message: 'ID invalide.' });
+        }
+
+        // Trouver le CV et vérifier qu'il appartient à l'utilisateur
+        const cv = await CV.findOne({ _id: cvId, user: userId });
+
+        if (!cv) {
+            return res.status(404).json({ message: 'CV introuvable ou non autorisé.' });
+        }
+
+        // Mettre à jour les champs autorisés
+        if (informationsPersonnelles) {
+            if (informationsPersonnelles.prenom) cv.informationsPersonnelles.prenom = informationsPersonnelles.prenom;
+            if (informationsPersonnelles.nom) cv.informationsPersonnelles.nom = informationsPersonnelles.nom;
+            if (informationsPersonnelles.description) cv.informationsPersonnelles.description = informationsPersonnelles.description;
+        }
+
+        if (education) cv.education = education;
+        if (experience) cv.experience = experience;
+        if (typeof visibilite !== 'undefined') cv.visibilite = visibilite;
+
+        // Sauvegarder les modifications
+        await cv.save();
+
+        res.status(200).json({ message: 'CV mis à jour avec succès.', cv });
+    } catch (error) {
+        res.status(500).json({ message: 'Erreur serveur.', error: error.message });
+    }
+};
+
+module.exports = { createCV, getAllVisibleCVs, deleteCV, updateVisibility, getCVDetails, getMyCVs, updateCV };
   
 
  
