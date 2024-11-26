@@ -3,6 +3,7 @@ const connectDB = require('./config/configdb'); // Connexion à MongoDB
 
 const authRouter = require('./router/auth'); // Routeur pour l'authentification
 const cvRouter = require('./router/cv');
+const recommendationRouter = require('./router/recommendation');
 
 const app = express(); // Créer une instance d'application Express
 const port = 5000; // Définir le port d'écoute
@@ -19,6 +20,9 @@ app.use('/auth', authRouter);
 
 // Routes pour les CV
 app.use('/api/cv', cvRouter);
+
+app.use('/api/recommendations', recommendationRouter);
+
 
 // Démarrer le serveur
 app.listen(port, () => {
