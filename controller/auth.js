@@ -73,6 +73,30 @@ const login = async (req, res) => {
   }
 };
 
-// Exporter les fonctions
-module.exports = { register, login };
+// Fonction pour récupérer les informations de l'utilisateur connecté
+const getUserDetails = async (req, res) => {
+  try {
+    const userId = req.user.id; // Obtenu depuis le middleware d'authentification
+
+    // Rechercher l'utilisateur par ID
+    const user = await User.findById(userId).select('firstname lastname email');
+
+    if (!user) {
+      return res.status(404).json({ message: 'Utilisateur non trouvé.' });
+    }
+
+    // Retourner les informations de l'utilisateur
+    res.status(200).json({
+      firstname: user.firstname,
+      lastname: user.lastname,
+      email: user.email,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Erreur serveur', error: error.message });
+  }
+};
+
+// Exporter la fonction
+module.exports = { register, login, getUserDetails };
+
 
